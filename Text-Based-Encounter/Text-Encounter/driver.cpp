@@ -142,6 +142,8 @@ void GameDriver::PlayGame()
 
 	if (DPM->IsGameStarted())
 	{
+		int bufferCounter = 0;
+
 		////////////////////////////////////////////
 		// The Main Game Loop
 		////////////////////////////////////////////
@@ -149,6 +151,7 @@ void GameDriver::PlayGame()
 		{
 			DisplayGameState();
 			PressAnyKey();
+			ScrollDown();
 			//this should notify users of the current situation (i.e. Each team character's HP, Crit/Counter Chance)
 
 			GetAction();
@@ -162,6 +165,9 @@ void GameDriver::PlayGame()
 			PressAnyKey();
 			//this should check for win/loss conditions and set if the game has concluded or not depending on what happened in Process()
 			//update any other things that were not addressed earlier here as well
+
+			bufferCounter++;
+			if (bufferCounter == 6) { ClearScreen(); bufferCounter = 0; }	//clear screen periodically
 		}
 	}
 	
@@ -177,12 +183,13 @@ void GameDriver::Run()
 	Startup();
 	ClearScreen();
 	PlayGame();
-	Pause();
+	//Pause();
 }
 
 //this should notify users of the current situation (i.e. Each team character's HP, Crit/Counter Chance)
 void GameDriver::DisplayGameState()
 {
+	std::cout << "\nENCOUNTER STATUS\n";
 	DPM->Alpha->DisplayState();
 	NEW_LINE(LEN);
 	DPM->Beta->DisplayState();

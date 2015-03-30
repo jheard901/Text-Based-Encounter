@@ -9,6 +9,7 @@ Character::Character() : bAlive(true)
 {
 	ini = DEFAULT;	//default character settings
 	GenID();
+	GenName();
 
 	//base stat settings
 	BASEHP = 600;
@@ -18,12 +19,14 @@ Character::Character() : bAlive(true)
 	CRIT_MULTIPLIER = 3;
 	CRIT_INCREMENT = 50;
 	COUNTER_INCREMENT = 25;
+	FLEE_CHANCE = 20;
 }
 
 Character::Character(int settings) : bAlive(true)
 {
 	ini = static_cast<Settings>(settings);
 	GenID();
+	GenName();
 
 	//base stat settings
 	BASEHP = 600;
@@ -33,6 +36,7 @@ Character::Character(int settings) : bAlive(true)
 	CRIT_MULTIPLIER = 3;
 	CRIT_INCREMENT = 50;
 	COUNTER_INCREMENT = 25;
+	FLEE_CHANCE = 20;
 }
 
 Character::~Character()
@@ -46,6 +50,12 @@ void Character::GenID()
 	_myID.i.i2 = GetRandomInt(0, 9);
 	_myID.i.i3 = GetRandomInt(0, 9);
 	_myID.i.i4 = GetRandomInt(0, 9);
+}
+
+void Character::GenName()
+{
+	//name = new std::string(GName::Inst().GetRandomName());	//this results in name showing only the address in memory when used with cout
+	name = GName::Inst().GetRandomName();
 }
 
 //controller 0 = PLAYER, 1 = AI | initState should be 0 (NORMAL)
@@ -98,7 +108,7 @@ void Character::Attack(Character* target)
 	}
 
 	//inflict that damage to the target
-	target->DamageTaken(float(damage), GetID());
+	target->DamageTaken(float(damage), GetID(), GetName());
 }
 
 bool Character::IsCriticalHit()
@@ -129,8 +139,22 @@ bool Character::IsCounterAttack()
 	}
 }
 
+bool Character::IsFleeing(float chance)
+{
+	float roll = frn() * 100;
+
+	if (roll <= chance)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 //this is where we check what state the character is in, and respond accordingly based off that
-void Character::DamageTaken(float dmgTaken, int srcPawnID)
+void Character::DamageTaken(float dmgTaken, int srcPawnID, std::string srcPawnName)
 {
 	switch (state)
 	{
@@ -138,15 +162,15 @@ void Character::DamageTaken(float dmgTaken, int srcPawnID)
 	case(NORMAL) :
 		cStats.Health -= dmgTaken;
 		SetDamaged(true);
-		DisplayString("\nPawn "); std::cout << GetID(); DisplayString(" took "); std::cout << dmgTaken; DisplayString(" damage.");
+		DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" took "); std::cout << dmgTaken; DisplayString(" damage.");
 		break;
 	//half damage taken and possible for a counter attack
 	case(DEFENDING) :
 		cStats.Health -= round(dmgTaken * 0.5);
-		DisplayString("\nPawn "); std::cout << GetID(); DisplayString(" was defending and only took "); std::cout << round(dmgTaken * 0.5); DisplayString(" damage.");
+		DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" was defending and only took "); std::cout << round(dmgTaken * 0.5); DisplayString(" damage.");
 		if (IsCounterAttack())
 		{
-			DisplayString("\nPawn "); std::cout << GetID(); DisplayString(" landed a counter attack and inflicted "); std::cout << dmgTaken; DisplayString(" damage back!");
+			DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" landed a counter attack and inflicted "); std::cout << dmgTaken; DisplayString(" damage back!");
 			SetCountered(true);
 			cntrDmg = dmgTaken;
 			ResetCounter();
@@ -156,13 +180,13 @@ void Character::DamageTaken(float dmgTaken, int srcPawnID)
 	case(CHARGING) :
 		cStats.Health -= dmgTaken;
 		SetDamaged(true);
-		DisplayString("\nPawn "); std::cout << GetID(); DisplayString(" took "); std::cout << dmgTaken; DisplayString(" damage.");
+		DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" took "); std::cout << dmgTaken; DisplayString(" damage.");
 		break;
 	//full damage taken
 	case(FLEEING) :
 		cStats.Health -= dmgTaken;
 		SetDamaged(true);
-		DisplayString("\nPawn "); std::cout << GetID(); DisplayString(" took "); std::cout << dmgTaken; DisplayString(" damage.");
+		DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" took "); std::cout << dmgTaken; DisplayString(" damage.");
 		break;
 	}
 }
@@ -172,7 +196,7 @@ Action Character::GetAction()
 	//PLAYER gets visual output
 	if (controller == PLAYER)
 	{
-		std::cout << "\nPawn " << GetID() << " - Your Actions:";
+		std::cout << "\nPawn " << GetName() << " - Your Actions:";
 		std::cout << "\nAttack = 0";
 		std::cout << "\nDefend = 1";
 		std::cout << "\nCharge = 2";
@@ -191,16 +215,23 @@ Action Character::GetAction()
 //resets specific combat variables only at the beginning of the combat phase
 void Character::ResetCombat()
 {
+	bFlee = false;
 	bAttacked = false;
 	bCountered = false;
 }
 
 void Character::DisplayStatus()
 {
-	std::cout << "\nPawn " << GetID() << ":";
+	std::cout << "\nPawn " << GetName();
 	std::cout << "\nHP: " << cStats.Health;
 	std::cout << "\nAttack Pwr: " << cStats.AttackDmg;
 	std::cout << "\nCrit Chance: " << cStats.CritChance;
 	std::cout << "\nCounter Chance: " << cStats.CounterChance;
 }
 
+void Character::DisplayStatusShort()
+{
+	std::cout << "\nPawn " << GetName();
+	std::cout << "\nHP: " << cStats.Health;
+	std::cout << "\nCounter Chance: " << cStats.CounterChance;
+}

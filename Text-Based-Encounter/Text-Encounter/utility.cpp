@@ -30,30 +30,30 @@ void ClearScreen()
 //this is suppose to be working but it is not, perhaps I am misinterpreting it and should
 //be using one of the other topics located at the bottom to achieve the effect I am looking
 //for: https://msdn.microsoft.com/en-us/library/windows/desktop/ms685118%28v=vs.85%29.aspx
-void ScrollUp()
+void ScrollDown()
 {
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	SMALL_RECT srcTargetWindow;
-	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-	POINT pt;
-	int scrollLength = 10;
+	//CONSOLE_SCREEN_BUFFER_INFO csbi;
+	//SMALL_RECT srcTargetWindow;
+	//HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	//POINT pt;
+	int scrollLength = 20;
 
 	//move down a lil bit
 	for (int i = 0; i < scrollLength; i++) { std::cout << "\n"; }
 
-	GetConsoleScreenBufferInfo(console, &csbi);
-	if (csbi.srWindow.Top >= scrollLength)
-	{
-		srcTargetWindow.Top = (SHORT)scrollLength;     // move top up
-		srcTargetWindow.Bottom = -static_cast<SHORT>(scrollLength);  // move bottom up 
-		srcTargetWindow.Left = 0;						// no change 
-		srcTargetWindow.Right = 0;						// no change
-
-		SetConsoleWindowInfo(console, FALSE, &srcTargetWindow);
-	}
+	//GetConsoleScreenBufferInfo(console, &csbi);
+	//if (csbi.srWindow.Top >= scrollLength)
+	//{
+	//	srcTargetWindow.Top = (SHORT)scrollLength;     // move top up
+	//	srcTargetWindow.Bottom = -static_cast<SHORT>(scrollLength);  // move bottom up 
+	//	srcTargetWindow.Left = 0;						// no change 
+	//	srcTargetWindow.Right = 0;						// no change
+	//
+	//	SetConsoleWindowInfo(console, FALSE, &srcTargetWindow);
+	//}
 
 	//GetCursorPos(&pt);
-	//COORD topLeft = { pt.x, pt.y };
+	//COORD topLeft = { pt.x, pt.y - scrollLength };
 	//SetConsoleCursorPosition(console, topLeft);
 }
 
@@ -79,19 +79,6 @@ int GetInt(int min, int max)
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			std::cout << "Invalid input. Please enter a number only: ";
 		}
-		//else if (min == max)	//special condition check | just realized I don't need this <,<
-		//{
-		//	if (in != max)
-		//	{
-		//		std::cin.clear();
-		//		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		//		std::cout << "Invalid input. Please enter a valid number: ";
-		//	}
-		//	else
-		//	{
-		//		ok = true;
-		//	}
-		//}
 		else if (in < min || in > max)
 		{
 			std::cin.clear();
@@ -109,7 +96,7 @@ int GetInt(int min, int max)
 //found some ideas on making this portable, but for now just testing it with Windows: http://stackoverflow.com/questions/1813552/tell-c-console-to-wait
 void GSleep(float seconds)
 {
-	Sleep(seconds * 1000);
+	Sleep(DWORD(seconds * 1000));
 }
 
 //found info on how to make this effect from: http://www.cplusplus.com/reference/string/string/copy/

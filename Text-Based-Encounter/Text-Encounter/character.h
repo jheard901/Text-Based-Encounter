@@ -1,5 +1,6 @@
 #pragma once
 
+#include "name.h"	//gives unique name ids to objects
 #include <stdint.h> //uint16_t
 
 enum Controller { PLAYER, AI };
@@ -24,6 +25,7 @@ private:
 		uint64_t id;
 	};
 	_keyIDTag _myID;
+	std::string name;
 
 	//important elements
 	typedef struct Stats
@@ -43,12 +45,15 @@ private:
 	float BASEHP, BASEATK, BASECRIT, BASECNTR;
 	float CRIT_MULTIPLIER;	//perhaps this should be added to stats?
 	float CRIT_INCREMENT, COUNTER_INCREMENT;
+	float FLEE_CHANCE;
 	bool bAlive;
+	bool bFlee;			//true when the character successfully fled during combat phase
 	bool bAttacked;		//true when the character has taken dmg during the combat phase
 	bool bCountered;	//true when the character has countered an attack
 	bool bInitialized;	//true when the character is ready/setup
 	bool bFinished;		//true when the character has successfully took action for their turn
 	int atkTarget;		//the target to attack
+	std::string atkTargetName;
 	float cntrDmg;		//the damage inflicted by a counter attack
 public:
 	//setup
@@ -57,6 +62,8 @@ public:
 	~Character();
 	void GenID();
 	int GetID() const { return static_cast<int>(_myID.id); }
+	void GenName();
+	std::string GetName() { return name; }
 	void InitCharacter(int controllerType, int initState);
 
 	//charater actions
@@ -69,10 +76,10 @@ public:
 	void Charge();
 	bool IsCharging();
 	void Flee();
-	bool IsFleeing();
+	bool IsFleeing(float chance);
 	
 	//affects character
-	void DamageTaken(float dmgTaken, int srcPawnID);
+	void DamageTaken(float dmgTaken, int srcPawnID, std::string srcPawnName);
 
 	//retrieving or updating actions/states
 	Action	GetAction();
@@ -91,24 +98,29 @@ public:
 	void SetCountered(bool val) { bCountered = val; }
 	bool Countered() { return bCountered; }	//did char counter?
 	float GetCounterDmg() { return cntrDmg; }
+	void SetFlee(bool val) { bFlee = val; }
+	bool FleeSuccess() { return bFlee; }
 
-	//handling crit/counter chance
+	//handling crit/counter/flee chance
 	void ResetCrit() { cStats.CritChance = stats.CritChance; }
 	void ResetCounter() { cStats.CounterChance = stats.CounterChance; }
 	void IncreaseCrit(float val) { cStats.CritChance += val; }
 	void IncreaseCounter(float val) { cStats.CounterChance += val; }
 	float GetCritIncrement() { return CRIT_INCREMENT; }
 	float GetCntrIncrement() { return COUNTER_INCREMENT; }
+	float GetFleeChance() { return FLEE_CHANCE; }
 
 	//setting attack target
-	void	SetTarget(int t) { atkTarget = t; }
+	void	SetTarget(int targetID, std::string targetName) { atkTarget = targetID; atkTargetName = targetName; }
 	int		GetTarget() { return atkTarget; }
+	std::string GetTargetName() { return atkTargetName; }
 
 	//reset specific combat variables
 	void	ResetCombat();
 
 	//key info
 	void DisplayStatus();
+	void DisplayStatusShort();
 	Controller GetController() { return controller; }
 	void SetAlive(bool val) { bAlive = val; }
 	bool IsAlive() { return bAlive; }

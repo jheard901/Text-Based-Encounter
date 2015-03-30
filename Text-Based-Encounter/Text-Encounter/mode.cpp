@@ -148,20 +148,20 @@ void DefaultPlayMode::CombatPhase()
 	//Team Alpha goes first
 	if (rPick == 0)
 	{
-		std::cout << "\nTeam " << Alpha->GetID() << " has first strike!\n";
+		std::cout << "\nTeam " << Alpha->GetName() << " has first strike!\n";
 		Alpha->CommitAction(Beta);
 		std::cout << "\n\n";
-		std::cout << "\nTeam " << Beta->GetID() << " begins to act!\n";
+		std::cout << "\nTeam " << Beta->GetName() << " begins to act!\n";
 		Beta->CommitAction(Alpha);
 		std::cout << "\n\n";
 	}
 	//or team Beta goes first
 	else
 	{
-		std::cout << "\nTeam " << Beta->GetID() << " has first strike!\n";
+		std::cout << "\nTeam " << Beta->GetName() << " has first strike!\n";
 		Beta->CommitAction(Alpha);
 		std::cout << "\n\n";
-		std::cout << "\nTeam " << Alpha->GetID() << " begins to act!\n";
+		std::cout << "\nTeam " << Alpha->GetName() << " begins to act!\n";
 		Alpha->CommitAction(Beta);
 		std::cout << "\n\n";
 	}
@@ -173,14 +173,19 @@ void DefaultPlayMode::UpdateGameState()
 	Beta->UpdateTeamState();
 
 	//check all possible ending states
-	if (Alpha->IsTeamDefeated() && !Beta->IsTeamDefeated())
+	if (Alpha->DidTeamFlee() || Beta->DidTeamFlee())
 	{
-		std::cout << "\nTeam " << Beta->GetID() << " is victorious!\n";
+		std::cout << "\nA team has escaped and the encounter ends in a draw!";
+		SetGameOver(true);
+	}
+	else if (Alpha->IsTeamDefeated() && !Beta->IsTeamDefeated())
+	{
+		std::cout << "\nTeam " << Beta->GetName() << " is victorious!\n";
 		SetGameOver(true);
 	}
 	else if (!Alpha->IsTeamDefeated() && Beta->IsTeamDefeated())
 	{
-		std::cout << "\nTeam " << Alpha->GetID() << " is victorious!\n";
+		std::cout << "\nTeam " << Alpha->GetName() << " is victorious!\n";
 		SetGameOver(true);
 	}
 	else if (Alpha->IsTeamDefeated() && Beta->IsTeamDefeated())

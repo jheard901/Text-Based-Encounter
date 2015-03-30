@@ -83,6 +83,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="mode.cpp" />
+    <ClCompile Include="name.cpp" />
     <ClCompile Include="team.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
@@ -91,6 +92,7 @@
     <ClInclude Include="driver.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="mode.h" />
+    <ClInclude Include="name.h" />
     <ClInclude Include="team.h" />
     <ClInclude Include="utility.h" />
   </ItemGroup>

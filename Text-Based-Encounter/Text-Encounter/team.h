@@ -23,14 +23,13 @@ private:
 		uint16_t i3;
 		uint16_t i4;
 	};
-
 	union _keyID
 	{
 		_ID i;
 		uint64_t id;
 	};
-
 	_keyID _myID;
+	std::string name;
 public:
 	//setup
 	Team();
@@ -38,13 +37,15 @@ public:
 	~Team();
 	void GenID();
 	int GetID() const { return static_cast<int>(_myID.id); }	//returns ID of team; useful for differentiating what team players are on... I think
-	//string GetName();	//future idea is to replace GetID() with this where applicable
+	void GenName();
+	std::string GetName() { return name; }
 	void InitTeam();
 
 	//important functions
 	void DisplayState();	//displays state of each character on team
 	void TakeAction(Team* opposingTeam);	//gets action from each character on a team, to take against another team | this can be redone better later
 	void CommitAction(Team* opposingTeam);
+	bool DidTeamFlee();	//true if any member of the team successfully fled
 	bool IsTeamDefeated();	//true when all members have died
 	void UpdateTeamState();	//updates the state of team setting Pawns dead/alive (in the future I will consider having these types of updates done immediately during the combat phase)
 	void ResetCombatStatus();	//resets specific combat variables for Pawns to their defaults at the start of a combat phase

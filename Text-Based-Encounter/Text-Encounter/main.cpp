@@ -49,8 +49,8 @@ void SetupConsole()
 	//setting buffer and window size
 	SetConsoleScreenBufferSize(hConsole, coord);
 	SetConsoleWindowInfo(hConsole, TRUE, &size);
-
-	//enabling mouse scrolling
-	GetConsoleMode(hConsole, &mode);
-	SetConsoleMode(hConsole, mode & ~ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT | ENABLE_PROCESSED_INPUT);
+	
+	//enabling mouse scrolling (not working | it appears to be much more complicated than this)
+	//GetConsoleMode(hConsole, &mode);
+	//SetConsoleMode(hConsole, mode & ~ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT);
 }
