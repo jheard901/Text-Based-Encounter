@@ -13,8 +13,8 @@ protected:
 public:
 	Mode();
 	~Mode();
-	void SetGameStarted(int value);
-	void SetGameOver(int value);
+	void SetGameStarted(bool value);
+	void SetGameOver(bool value);
 	bool IsGameStarted();
 	bool IsGameOver();
 
@@ -32,6 +32,10 @@ private:
 public:
 	Team* Alpha;	//this will be the player's team by default
 	Team* Beta;
+	//for OOD, I should of made an array of Team*.
+	//Later I can change this, but for now this game
+	//mode is hard-coded for only two teams.
+
 
 	DefaultPlayMode();
 	DefaultPlayMode(int mode);
@@ -41,6 +45,9 @@ public:
 	void SetConnection(int pc);
 
 	void InitGame();	//setup the game rules prior to calling this
+	void ActionPhase();	//for getting actions from each team
+	void CombatPhase();
+	void UpdateGameState();
 };
 
 //future modes can be added for different experiences apart from the text-based combat of DefaultPlayMode

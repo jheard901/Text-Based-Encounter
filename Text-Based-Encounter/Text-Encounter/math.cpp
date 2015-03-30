@@ -17,12 +17,22 @@ float GetRandomFloat(float a, float b)
 	return (frn() * (b - a)) + a;
 }
 
-//create a random int between a - b
+//create a random int between a - b | truncates towards 0
 int GetRandomInt(float a, float b)
 {
 	if (a >= b) // bad input
 		return a;
 
 	return int((frn() * (b - a)) + a);
+}
+
+//create random int between a - b | only works with positive numbers
+int GetTrueRandomInt(int a, int b)
+{
+	if (a >= b)	// bad input
+		return a;
+
+	int c = (b - a) + 1;
+	return rand() % c + a;
 }
 

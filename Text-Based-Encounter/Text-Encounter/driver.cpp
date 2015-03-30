@@ -7,6 +7,7 @@
 
 #define NEW_LINE(x) { for(int i = 0; i < x; i++) { std::cout << std::endl; } }	//quick macro for new lines
 const int LEN = 2;
+const int SEC = 2;
 
 //some handy info on strings (in case I need them later)
 // http://stackoverflow.com/questions/5838711/c-cin-input-with-spaces
@@ -129,6 +130,7 @@ void GameDriver::PlayGame()
 	{
 		//run any pregame code here
 		DPM->InitGame();
+		ClearScreen();
 
 		//game is starting!
 		std::cout << "NEW BATTLE ENCOUNTER";
@@ -146,6 +148,7 @@ void GameDriver::PlayGame()
 		while (!DPM->IsGameOver())
 		{
 			DisplayGameState();
+			PressAnyKey();
 			//this should notify users of the current situation (i.e. Each team character's HP, Crit/Counter Chance)
 
 			GetAction();
@@ -156,6 +159,7 @@ void GameDriver::PlayGame()
 			//this includes displaying damage taken/inflicted, defending, etc... by both Team characters
 
 			UpdateGameState();
+			PressAnyKey();
 			//this should check for win/loss conditions and set if the game has concluded or not depending on what happened in Process()
 			//update any other things that were not addressed earlier here as well
 		}
@@ -186,22 +190,29 @@ void GameDriver::DisplayGameState()
 }
 
 //this should notify the user of all actions they can do, then proceed to get input for what their action will be
+//set each character's state accordingly as well
 void GameDriver::GetAction()
 {
-
+	std::cout << "\nACTION PHASE\n";
+	DPM->ActionPhase();
+	//DPM->Alpha->TakeAction();
+	//NEW_LINE(LEN);
+	//DPM->Beta->TakeAction();
+	//NEW_LINE(LEN);
 }
 
 //this should display what happens as the result of the player's action
 //this includes displaying damage taken/inflicted, defending, etc... by both Team characters
 void GameDriver::Process()
 {
-
+	std::cout << "\nCOMBAT PHASE\n";
+	DPM->CombatPhase();
 }
 
 //this should check for win/loss conditions and set if the game has concluded or not depending on what happened in Process()
 //update any other things that were not addressed earlier here as well
 void GameDriver::UpdateGameState()
 {
-
+	DPM->UpdateGameState();
 }
 
