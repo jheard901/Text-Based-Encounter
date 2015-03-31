@@ -1,6 +1,8 @@
 
 #include "mode.h"
 #include "math.h"
+#include "utility.h"	//Pause()
+#include <cstdlib>	//exit()
 #include <iostream>
 
 ////////////////////////////////////////////
@@ -95,20 +97,23 @@ void DefaultPlayMode::InitGame()
 		switch (pSkill)
 		{
 		case(EASY) :
-			Alpha = new Team(1, EASY);
-			Beta = new Team(1, EASY);
+			Alpha = new Team(teamAlphaSize, EASY);
+			Beta = new Team(teamBetaSize, EASY);
 			break;
 		case(HARD) :
-			Alpha = new Team(1, EASY);
-			Beta = new Team(1, HARD);
+			Alpha = new Team(teamAlphaSize, EASY);
+			Beta = new Team(teamBetaSize, HARD);
 			break;
 		case(OP) :
-			Alpha = new Team(1, HARD);
-			Beta = new Team(1, OP);
+			Alpha = new Team(teamAlphaSize, HARD);
+			Beta = new Team(teamBetaSize, OP);
 			break;
 		}
 		break;
 	case(MULTIPLAYER) :
+		std::cout << "\n\nMultiplayer not implemented yet. Please restart game!\n";
+		Pause();
+		exit(0);
 		switch (pNetwork)
 		{
 		case(LOCAL) :

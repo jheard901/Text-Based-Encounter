@@ -77,55 +77,60 @@ void Team::TakeAction(Team* opposingTeam)
 	{
 		for (int i = 0; i < GetTeamSize(); i++)
 		{
-			Pawn[i]->SetFinished(false);
-			while (!Pawn[i]->IsFinished())
+			if (Pawn[i]->IsAlive())
 			{
-				//this is how the player takes action
-				if (Pawn[i]->GetController() == PLAYER)
+				Pawn[i]->SetFinished(false);
+				while (!Pawn[i]->IsFinished())
 				{
-					Pawn[i]->SetAction(Pawn[i]->GetAction());
-
-					//attacking requires a little extra work
-					if (Pawn[i]->RetAction() == ATTACK)
+					//this is how the player takes action
+					if (Pawn[i]->GetController() == PLAYER)
 					{
-						//store each possible target
-						std::vector<int> charID;
-						std::vector<std::string> charName;
+						Pawn[i]->SetAction(Pawn[i]->GetAction());
 
-						//display all targets and their status
-						std::cout << "\nSelect Target:";
-						for (int j = 0; j < opposingTeam->GetTeamSize(); j++)
+						//attacking requires a little extra work
+						if (Pawn[i]->RetAction() == ATTACK)
 						{
-							std::cout << "\nTeam " << opposingTeam->GetName();
-							opposingTeam->GetChar(j)->DisplayStatusShort();
+							//store each possible target
+							std::vector<int> charID;
+							std::vector<std::string> charName;
+
+							//display all targets and their status
+							std::cout << "\nSelect Target:";
+							for (int j = 0; j < opposingTeam->GetTeamSize(); j++)
+							{
+								std::cout << "\nTeam " << opposingTeam->GetName();
+								opposingTeam->GetChar(j)->DisplayStatusShort();
+							}
+
+							//display list of targetst o select
+							std::cout << "\n\nTarget List:";
+							for (int j = 0; j < opposingTeam->GetTeamSize(); j++)
+							{
+								std::cout << "\nPawn " << opposingTeam->GetChar(j)->GetName() << " = " << j;
+								charID.push_back(opposingTeam->GetChar(j)->GetID());
+								charName.push_back(opposingTeam->GetChar(j)->GetName());
+							}
+
+							std::cout << "\n\nYour Selection: ";
+							int value = GetInt(0, charID.size() - 1);
+							Pawn[i]->SetTarget(charID.at(value), charName.at(value));
 						}
 
-						//display list of targetst o select
-						std::cout << "\n\nTarget List:";
-						for (int j = 0; j < opposingTeam->GetTeamSize(); j++)
-						{
-							std::cout << "\nPawn " << opposingTeam->GetChar(j)->GetName() << " = " << j;
-							charID.push_back(opposingTeam->GetChar(j)->GetID());
-							charName.push_back(opposingTeam->GetChar(j)->GetName());
-						}
+						//set state based off action
+						Pawn[i]->SetState(static_cast<int>(Pawn[i]->RetAction()));
 
-						std::cout << "\n\nYour Selection: ";
-						int value = GetInt(0, charID.size() - 1);
-						Pawn[i]->SetTarget(charID.at(value), charName.at(value));
+						//conclude this character's turn
+						Pawn[i]->SetFinished(true);
+						std::cout << "\n";
 					}
-
-					//set state based off action
-					Pawn[i]->SetState(static_cast<int>(Pawn[i]->RetAction()));
-
-					//conclude this character's turn
-					Pawn[i]->SetFinished(true);
-					std::cout << "\n";
-				}
-				//this is how AI takes action
-				else if (Pawn[i]->GetController() == AI)
-				{
-					//AI does some action here (need to make a function for it in character.cpp)
-					//maybe add in some feedback like: "Pawn selected an action" once AI has chosen
+					//this is how AI takes action
+					else if (Pawn[i]->GetController() == AI)
+					{
+						//AI does some action here (need to make a function for it in character.cpp)
+						//maybe add in some feedback like: "Pawn selected an action" once AI has chosen
+						ComputeBestAction(Pawn[i], opposingTeam);
+						Pawn[i]->SetFinished(true);
+					}
 				}
 			}
 		}
@@ -315,3 +320,34 @@ Character* Team::GetCharByID(int ID)
 		std::cout << "\nError. TeamSize is <= 0.";
 	}
 }
+
+void Team::ComputeBestAction(Character* nPawn, Team* opposingTeam)
+{
+	float* assessment = new float[opposingTeam->GetTeamSize()];
+	float bestValue = 0;
+	int target;
+
+	//pick a target
+	for (int i = 0; i < opposingTeam->GetTeamSize(); i++)
+	{
+		assessment[i] = nPawn->AssessTarget(opposingTeam->GetChar(i));	//the best value basically means that character is the most favorable target
+		if (assessment[i] > bestValue)
+		{
+			bestValue = assessment[i];
+			target = i;
+		}
+	}
+
+	//pick an action against that target
+	nPawn->SetAction(nPawn->PickBestAction(opposingTeam->GetChar(target)));
+	if (nPawn->RetAction() == ATTACK)
+	{
+		nPawn->SetTarget(opposingTeam->GetChar(target)->GetID(), opposingTeam->GetChar(target)->GetName());
+	}
+
+	//set state based off action
+	nPawn->SetState(static_cast<int>(nPawn->RetAction()));
+
+	delete[] assessment;
+}
+

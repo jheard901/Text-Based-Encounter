@@ -52,4 +52,7 @@ public:
 	Character* GetChar(int N) { return Pawn[N]; }	//returns a character by index
 	Character* GetCharByID(int ID);	//returns a character by ID
 	int GetTeamSize() { return teamSize; }
+
+	//ai stuff
+	void ComputeBestAction(Character* nPawn, Team* opposingTeam);	//picks the best action for a pawn against a team
 };

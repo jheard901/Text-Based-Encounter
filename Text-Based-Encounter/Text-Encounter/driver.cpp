@@ -90,7 +90,23 @@ int GameDriver::NetworkSelect()
 	return userInput;
 }
 
-void GameDriver::Init(int m, int d, int n)
+int GameDriver::TeamSelectA()
+{
+	std::cout << "\nSelect size (1-4) of first team: \n";
+	userInput = GetInput(1, 4);
+
+	return userInput;
+}
+
+int GameDriver::TeamSelectB()
+{
+	std::cout << "\nSelect size (1-4) of second team: \n";
+	userInput = GetInput(1, 4);
+
+	return userInput;
+}
+
+void GameDriver::Init(int m, int d, int n, int a, int b)
 {
 	//seed random number generator once
 	srand(unsigned(time(NULL)));
@@ -107,7 +123,11 @@ void GameDriver::Init(int m, int d, int n)
 	//setup mutliplayer network connection
 	DPM->SetConnection(n);
 
+	//setup team alpha size
+	DPM->SetAlphaSize(a);
 
+	//setup team beta size
+	DPM->SetBetaSize(b);
 }
 
 void GameDriver::Startup()
@@ -116,9 +136,11 @@ void GameDriver::Startup()
 	int mode = ModeSelect();
 	int difficulty = DifficultySelect();
 	int network = NetworkSelect();
+	int tACount = TeamSelectA();
+	int tBCount = TeamSelectB();
 
 	//Initialize game based off selected settings
-	Init(mode, difficulty, network);
+	Init(mode, difficulty, network, tACount, tBCount);
 }
 
 void GameDriver::PlayGame()
@@ -152,19 +174,13 @@ void GameDriver::PlayGame()
 			DisplayGameState();
 			PressAnyKey();
 			ScrollDown();
-			//this should notify users of the current situation (i.e. Each team character's HP, Crit/Counter Chance)
 
 			GetAction();
-			//this should notify the user of all actions they can do, then proceed to get input for what their action will be
 
 			Process();
-			//this should display what happens as the result of the player's action
-			//this includes displaying damage taken/inflicted, defending, etc... by both Team characters
 
 			UpdateGameState();
 			PressAnyKey();
-			//this should check for win/loss conditions and set if the game has concluded or not depending on what happened in Process()
-			//update any other things that were not addressed earlier here as well
 
 			bufferCounter++;
 			if (bufferCounter == 6) { ClearScreen(); bufferCounter = 0; }	//clear screen periodically
@@ -202,10 +218,6 @@ void GameDriver::GetAction()
 {
 	std::cout << "\nACTION PHASE\n";
 	DPM->ActionPhase();
-	//DPM->Alpha->TakeAction();
-	//NEW_LINE(LEN);
-	//DPM->Beta->TakeAction();
-	//NEW_LINE(LEN);
 }
 
 //this should display what happens as the result of the player's action

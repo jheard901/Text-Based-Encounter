@@ -55,6 +55,15 @@ private:
 	int atkTarget;		//the target to attack
 	std::string atkTargetName;
 	float cntrDmg;		//the damage inflicted by a counter attack
+
+	//ai stuff
+	typedef struct Threshold
+	{
+		float low;
+		float mid;
+		float high;
+	};
+	Threshold hp;
 public:
 	//setup
 	Character();
@@ -109,11 +118,21 @@ public:
 	float GetCritIncrement() { return CRIT_INCREMENT; }
 	float GetCntrIncrement() { return COUNTER_INCREMENT; }
 	float GetFleeChance() { return FLEE_CHANCE; }
+	float GetCritChance() { return cStats.CritChance; }
+	float GetCounterChance() { return cStats.CounterChance; }
 
 	//setting attack target
 	void	SetTarget(int targetID, std::string targetName) { atkTarget = targetID; atkTargetName = targetName; }
 	int		GetTarget() { return atkTarget; }
 	std::string GetTargetName() { return atkTargetName; }
+
+	//ai stuff
+	float AssessTarget(Character* target);
+	float AssessAction(Character* target, Action myAction);
+	Action PickBestAction(Character* target);
+	float GetHPLow() { return hp.low; }
+	float GetHPMid() { return hp.mid; }
+	float GetHPHigh() { return hp.high; }
 
 	//reset specific combat variables
 	void	ResetCombat();

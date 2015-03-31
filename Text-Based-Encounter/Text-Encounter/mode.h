@@ -27,6 +27,8 @@ private:
 	PlayerMode pMode;
 	Difficulty pSkill;
 	Connection pNetwork;
+	int	teamAlphaSize;
+	int teamBetaSize;
 
 	bool bGameOver;
 public:
@@ -43,6 +45,8 @@ public:
 	void SetPlayerMode(int pm);
 	void SetDifficulty(int pd);
 	void SetConnection(int pc);
+	void SetAlphaSize(int num) { teamAlphaSize = num; }
+	void SetBetaSize(int num) { teamBetaSize = num; }
 
 	void InitGame();	//setup the game rules prior to calling this
 	void ActionPhase();	//for getting actions from each team

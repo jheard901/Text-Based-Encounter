@@ -14,10 +14,12 @@ public:
 	GameDriver();
 	~GameDriver();
 	int GetInput(int min, int max);	//gets input from user within a specified range
-	int ModeSelect();	//user selects game mode
+	int ModeSelect();		//user selects game mode
 	int DifficultySelect();	//user selects the difficulty mode
 	int NetworkSelect();	//user selects network for multiplayer
-	void Init(int m, int d, int n);	//inits the game mode
+	int TeamSelectA();		//user selects size of teams | in future, use better OOP method
+	int TeamSelectB();
+	void Init(int m, int d, int n, int a, int b);	//inits the game mode
 	void Startup();
 	void PlayGame();
 	void Shutdown();

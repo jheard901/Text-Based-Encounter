@@ -92,6 +92,11 @@ void Character::InitCharacter(int controllerType, int initState)
 
 	controller = static_cast<Controller>(controllerType);
 	state = static_cast<State>(initState);
+
+	//set ai stuff
+	hp.high = stats.Health * 0.75;
+	hp.mid = stats.Health * 0.5;
+	hp.low = stats.Health * 0.25;
 }
 
 void Character::Attack(Character* target)
@@ -210,6 +215,343 @@ Action Character::GetAction()
 	{
 		//maybe throw in a function here for the AI (it's gonna be long I imagine)
 	}
+}
+
+//heuristic for measuring the value of a target | this could be done better to account
+//for the AI's own HP in regards to the damage that is likely to be inflicted by a charcater;
+//additionally, this is biased towards picking a target based off who the AI should attack
+//and not accounting for all other possible actions such as defending, charging, or fleeing
+float Character::AssessTarget(Character* target)
+{
+	float value = 1;
+
+	//is alive
+	if (target->IsAlive())
+	{
+		value += 10;
+
+		//assess health
+		if (target->GetHealth() > target->GetHPHigh())
+		{
+			value += 20;
+		}
+		else if (target->GetHealth() < target->GetHPHigh() && target->GetHealth() > target->GetHPMid())
+		{
+			value += 40;
+		}
+		else if (target->GetHealth() < target->GetHPMid() && target->GetHealth() > target->GetHPLow())
+		{
+			value += 60;
+		}
+		else if (target->GetHealth() < target->GetHPLow())
+		{
+			value += 100;
+		}
+
+		//assess defense
+		if (target->GetCounterChance() > 50)
+		{
+			value += 10;
+		}
+		else
+		{
+			value += 40;
+		}
+	}
+
+	return value;
+}
+
+//this could be done so much better like I recommended with AssessTarget, but I am
+//short on time to get this done, so this will have to do for now
+float Character::AssessAction(Character* target, Action myAction)
+{
+	float value = 1;
+
+	switch (myAction)
+	{
+	case(ATTACK) :
+		//assess my health
+		if (GetHealth() > GetHPHigh())
+		{
+			value += 300;
+		}
+		else if (GetHealth() < GetHPHigh() && GetHealth() > GetHPMid())
+		{
+			value += 200;
+		}
+		else if (GetHealth() < GetHPMid() && GetHealth() > GetHPLow())
+		{
+			value += 150;
+		}
+		else if (GetHealth() < GetHPLow())
+		{
+			value += 50;
+		}
+		//assess target health (higher chance if their health is low)
+		if (target->GetHealth() > target->GetHPHigh())
+		{
+			value += 75;
+		}
+		else if (target->GetHealth() < target->GetHPHigh() && target->GetHealth() > target->GetHPMid())
+		{
+			value += 125;
+		}
+		else if (target->GetHealth() < target->GetHPMid() && target->GetHealth() > target->GetHPLow())
+		{
+			value += 175;
+		}
+		else if (target->GetHealth() < target->GetHPLow())
+		{
+			value += 300;
+		}
+		//assess target counter chance
+		if (target->GetCounterChance() > 75)
+		{
+			value -= 300;
+		}
+		else if (target->GetCounterChance() < 75 && target->GetCounterChance() > 50)
+		{
+			value -= 200;
+		}
+		else if (target->GetCounterChance() < 50 && target->GetCounterChance() > 20)
+		{
+			value += 150;
+		}
+		else if (target->GetCounterChance() < 20)
+		{
+			value += 100;
+		}
+		//compare my health to target health
+		if (GetHealth() > target->GetHealth())
+		{
+			value += 200;
+		}
+		else if (GetHealth() <= target->GetHealth())
+		{
+			value += 100;
+		}
+		//assess my crit chance
+		if (GetCritChance() > 75)
+		{
+			value += 350;
+		}
+		else if (GetCritChance() > 50)
+		{
+			value += 250;
+		}
+		else if (GetCritChance() > 25)
+		{
+			value += 150;
+		}
+		else
+		{
+			value += 100;
+		}
+		break;
+	case(DEFEND) :
+		//assess my health (higher chance here if health is low)
+		if (GetHealth() > GetHPHigh())
+		{
+			value += 50;
+		}
+		else if (GetHealth() < GetHPHigh() && GetHealth() > GetHPMid())
+		{
+			value += 100;
+		}
+		else if (GetHealth() < GetHPMid() && GetHealth() > GetHPLow())
+		{
+			value += 250;
+		}
+		else if (GetHealth() < GetHPLow())
+		{
+			value += 400;
+		}
+		//compare my health to target health
+		if (GetHealth() > target->GetHealth())
+		{
+			value += 50;
+		}
+		else if (GetHealth() <= target->GetHealth())
+		{
+			value += 100;
+		}
+		//assess my counter chance
+		if (GetCounterChance() > 75)
+		{
+			value += 250;
+		}
+		else if (GetCounterChance() < 75 && GetCounterChance() > 50)
+		{
+			value += 200;
+		}
+		else if (GetCounterChance() < 50 && GetCounterChance() > 20)
+		{
+			value += 150;
+		}
+		else if (GetCounterChance() < 20)
+		{
+			value += 50;
+		}
+		//assess target crit chance
+		if (target->GetCritChance() > 50)
+		{
+			value += 150;
+		}
+		else
+		{
+			value += 100;
+		}
+		break;
+	case(CHARGE) :
+		//assess my health
+		if (GetHealth() > GetHPHigh())
+		{
+			value += 250;
+		}
+		else if (GetHealth() < GetHPHigh() && GetHealth() > GetHPMid())
+		{
+			value += 200;
+		}
+		else if (GetHealth() < GetHPMid() && GetHealth() > GetHPLow())
+		{
+			value += 100;
+		}
+		else if (GetHealth() < GetHPLow())
+		{
+			value += 50;
+		}
+		//assess my crit chance
+		if (GetCritChance() >= 50)
+		{
+			value += 50;
+		}
+		else
+		{
+			value += 150;
+		}
+		//assess my counter chance
+		if (GetCounterChance() > 75)
+		{
+			value += 10;
+		}
+		else if (GetCounterChance() < 75 && GetCounterChance() > 50)
+		{
+			value += 50;
+		}
+		else if (GetCounterChance() < 50 && GetCounterChance() > 20)
+		{
+			value += 175;
+		}
+		else if (GetCounterChance() < 20)
+		{
+			value += 250;
+		}
+		break;
+	case(FLEE) :
+		//assess my health (higher chance here if health is low)
+		if (GetHealth() > GetHPHigh())
+		{
+			value += 50;
+		}
+		else if (GetHealth() < GetHPHigh() && GetHealth() > GetHPMid())
+		{
+			value += 100;
+		}
+		else if (GetHealth() < GetHPMid() && GetHealth() > GetHPLow())
+		{
+			value += 250;
+		}
+		else if (GetHealth() < GetHPLow())
+		{
+			value += 400;
+		}
+		//assess target health
+		if (target->GetHealth() > target->GetHPHigh())
+		{
+			value += 50;
+		}
+		else if (target->GetHealth() < target->GetHPHigh() && target->GetHealth() > target->GetHPMid())
+		{
+			value += 100;
+		}
+		else if (target->GetHealth() < target->GetHPMid() && target->GetHealth() > target->GetHPLow())
+		{
+			value += 150;
+		}
+		else if (target->GetHealth() < target->GetHPLow())
+		{
+			value += 200;
+		}
+		break;
+	}
+
+	if (value <= 0) { value = 1; }	//safety net
+	return value;
+}
+
+//picks the best action against a target
+Action Character::PickBestAction(Character* target)
+{
+	const int numActions = 4;
+	float hValue[numActions];	//represents four heuristic values | one for each action
+	float bestValue = 0;
+	int action;
+
+	//assess each action against target
+	for (int i = 0; i < numActions; i++)
+	{
+		hValue[i] = AssessAction(target, static_cast<Action>(i));	//the best value basically means that character is the most favorable target
+		if (hValue[i] > bestValue)
+		{
+			bestValue = hValue[i];
+			action = i;
+		}
+	}
+
+	//do a little RNG magic to make sure it is not always guaranteed to pick the same move
+	float accumulatedWeight = 0;
+	float normalizedWeight[numActions];
+	float weightCount = 0;
+	float randValue = frn();
+	for (int i = 0; i < numActions; i++)
+	{
+		accumulatedWeight += hValue[i];
+	}
+	for (int i = 0; i < numActions; i++)
+	{
+		normalizedWeight[i] = hValue[i] / accumulatedWeight;
+	}
+	//method 1
+	//for (int i = 0; i < numActions; i++)
+	//{
+	//	if (normalizedWeight[i] + weightCount >= randValue)
+	//	{
+	//		action = i;
+	//		break;
+	//	}
+	//	else
+	//	{
+	//		weightCount += normalizedWeight[i];
+	//	}
+	//}
+	//method 2
+	int j = 0;
+	while (1)
+	{
+		if (normalizedWeight[j] >= frn())
+		{
+			action = j;
+			break;
+		}
+		else
+		{
+			j++;
+		}
+		if (j >= numActions) { j = 0; }
+	}
+
+	return static_cast<Action>(action);
 }
 
 //resets specific combat variables only at the beginning of the combat phase
