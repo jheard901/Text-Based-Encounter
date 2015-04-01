@@ -3,7 +3,7 @@
 #include "math.h"
 #include "utility.h"
 #include <iostream>
-#include <vector>
+
 
 Team::Team() : teamSize(0)
 {
@@ -30,10 +30,10 @@ Team::~Team()
 
 void Team::GenID()
 {
-	_myID.i.i1 = GetRandomInt(0, 9);
-	_myID.i.i2 = GetRandomInt(0, 9);
-	_myID.i.i3 = GetRandomInt(0, 9);
-	_myID.i.i4 = GetRandomInt(0, 9);
+	_myID.i.i1 = math::GetRandomInt(0, 9);
+	_myID.i.i2 = math::GetRandomInt(0, 9);
+	_myID.i.i3 = math::GetRandomInt(0, 9);
+	_myID.i.i4 = math::GetRandomInt(0, 9);
 }
 
 void Team::GenName()
@@ -48,7 +48,7 @@ void Team::InitTeam()
 		for (int i = 0; i < GetTeamSize(); i++)
 		{
 			std::cout << "\nTeam " << GetName() << " Pawn " << Pawn[i]->GetName() << ": Player(0) or AI(1)?\n";
-			Pawn[i]->InitCharacter(GetInt(0, 1), 0);
+			Pawn[i]->InitCharacter(utility::GetInt(0, 1), 0);
 		}
 	}
 }
@@ -112,7 +112,7 @@ void Team::TakeAction(Team* opposingTeam)
 							}
 
 							std::cout << "\n\nYour Selection: ";
-							int value = GetInt(0, charID.size() - 1);
+							int value = utility::GetInt(0, charID.size() - 1);
 							Pawn[i]->SetTarget(charID.at(value), charName.at(value));
 						}
 
@@ -152,7 +152,9 @@ void Team::CommitAction(Team* opposingTeam)
 			//notify user pawn is dead
 			if (!Pawn[i]->IsAlive())
 			{
-				DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" is dead!");
+				utility::DisplayString("\nPawn "); 
+                std::cout << Pawn[i]->GetName(); 
+                utility::DisplayString(" is dead!");
 			}
 			//otherwise proceed as normal
 			else
@@ -161,7 +163,10 @@ void Team::CommitAction(Team* opposingTeam)
 				switch (Pawn[i]->RetAction())
 				{
 				case(ATTACK) :
-					DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" attempts to attack Pawn "); std::cout << Pawn[i]->GetTargetName() << std::endl;
+					utility::DisplayString("\nPawn "); 
+                    std::cout << Pawn[i]->GetName(); 
+                    utility::DisplayString(" attempts to attack Pawn "); 
+                    std::cout << Pawn[i]->GetTargetName() << std::endl;
 					Pawn[i]->Attack(opposingTeam->GetCharByID(Pawn[i]->GetTarget()));
 					if (opposingTeam->GetCharByID(Pawn[i]->GetTarget())->Countered())
 					{
@@ -170,37 +175,53 @@ void Team::CommitAction(Team* opposingTeam)
 					}
 					break;
 				case(DEFEND) :
-					DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" is defending.");
+					utility::DisplayString("\nPawn ");
+                    std::cout << Pawn[i]->GetName(); 
+                    utility::DisplayString(" is defending.");
 					break;
 				case(CHARGE) :
-					DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" is attempting to charge up.");
+					utility::DisplayString("\nPawn "); 
+                    std::cout << Pawn[i]->GetName(); 
+                    utility::DisplayString(" is attempting to charge up.");
 					if (Pawn[i]->IsDamaged())
 					{
 						Pawn[i]->IncreaseCrit(Pawn[i]->GetCritIncrement() * 0.5);
 						Pawn[i]->IncreaseCounter(Pawn[i]->GetCntrIncrement() * 0.5);
-						DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" took damage this turn and only partially charged.");
+						utility::DisplayString("\nPawn "); 
+                        std::cout << Pawn[i]->GetName(); 
+                        utility::DisplayString(" took damage this turn and only partially charged.");
 					}
 					else
 					{
 						Pawn[i]->IncreaseCrit(Pawn[i]->GetCritIncrement());
 						Pawn[i]->IncreaseCounter(Pawn[i]->GetCntrIncrement());
-						DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" successfully charged!");
+						utility::DisplayString("\nPawn "); 
+                        std::cout << Pawn[i]->GetName(); 
+                        utility::DisplayString(" successfully charged!");
 					}
 					break;
 				case(FLEE) :
-					DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" is attempting to flee combat!");
+					utility::DisplayString("\nPawn "); 
+                    std::cout << Pawn[i]->GetName(); 
+                    utility::DisplayString(" is attempting to flee combat!");
 					//lower chance to flee if damaged
 					if (Pawn[i]->IsDamaged())
 					{
-						DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" took damage this turn and is less mobile.");
+						utility::DisplayString("\nPawn "); 
+                        std::cout << Pawn[i]->GetName(); 
+                        utility::DisplayString(" took damage this turn and is less mobile.");
 						if (Pawn[i]->IsFleeing(Pawn[i]->GetFleeChance() * 0.5))
 						{
 							Pawn[i]->SetFlee(true);
-							DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" successfully escaped from combat!");
+							utility::DisplayString("\nPawn "); 
+                            std::cout << Pawn[i]->GetName(); 
+                            utility::DisplayString(" successfully escaped from combat!");
 						}
 						else
 						{
-							DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" failed to escape.");
+							utility::DisplayString("\nPawn "); 
+                            std::cout << Pawn[i]->GetName(); 
+                            utility::DisplayString(" failed to escape.");
 						}
 					}
 					//higher flee chance if not hurt
@@ -209,11 +230,15 @@ void Team::CommitAction(Team* opposingTeam)
 						if (Pawn[i]->IsFleeing(Pawn[i]->GetFleeChance()))
 						{
 							Pawn[i]->SetFlee(true);
-							DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" successfully escaped from combat!");
+							utility::DisplayString("\nPawn "); 
+                            std::cout << Pawn[i]->GetName(); 
+                            utility::DisplayString(" successfully escaped from combat!");
 						}
 						else
 						{
-							DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" failed to escape.");
+							utility::DisplayString("\nPawn "); 
+                            std::cout << Pawn[i]->GetName(); 
+                            utility::DisplayString(" failed to escape.");
 						}
 					}
 					break;
@@ -277,7 +302,9 @@ void Team::UpdateTeamState()
 				if (Pawn[i]->IsAlive())
 				{
 					Pawn[i]->SetAlive(false);
-					DisplayString("\nPawn "); std::cout << Pawn[i]->GetName(); DisplayString(" died this turn.");
+					utility::DisplayString("\nPawn "); 
+                    std::cout << Pawn[i]->GetName(); 
+                    utility::DisplayString(" died this turn.");
 				}
 			}
 		}

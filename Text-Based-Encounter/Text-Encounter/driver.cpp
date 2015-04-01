@@ -2,8 +2,7 @@
 #include "driver.h"
 #include "utility.h"
 #include <iostream>
-#include <stdlib.h> //srand(), rand()
-#include <time.h> //time()
+#include <random>
 
 #define NEW_LINE(x) { for(int i = 0; i < x; i++) { std::cout << std::endl; } }	//quick macro for new lines
 const int LEN = 2;
@@ -108,9 +107,6 @@ int GameDriver::TeamSelectB()
 
 void GameDriver::Init(int m, int d, int n, int a, int b)
 {
-	//seed random number generator once
-	srand(unsigned(time(NULL)));
-
 	//create game mode (this game for now only has one)
 	DPM = new DefaultPlayMode;
 
@@ -152,7 +148,7 @@ void GameDriver::PlayGame()
 	{
 		//run any pregame code here
 		DPM->InitGame();
-		ClearScreen();
+		utility::ClearScreen();
 
 		//game is starting!
 		std::cout << "NEW BATTLE ENCOUNTER";
@@ -172,18 +168,18 @@ void GameDriver::PlayGame()
 		while (!DPM->IsGameOver())
 		{
 			DisplayGameState();
-			PressAnyKey();
-			ScrollDown();
+			utility::PressAnyKey();
+			utility::ScrollDown();
 
 			GetAction();
 
 			Process();
 
 			UpdateGameState();
-			PressAnyKey();
+			utility::PressAnyKey();
 
 			bufferCounter++;
-			if (bufferCounter == 6) { ClearScreen(); bufferCounter = 0; }	//clear screen periodically
+			if (bufferCounter == 6) { utility::ClearScreen(); bufferCounter = 0; }	//clear screen periodically
 		}
 	}
 	
@@ -197,7 +193,7 @@ void GameDriver::Shutdown()
 void GameDriver::Run()
 {
 	Startup();
-	ClearScreen();
+	utility::ClearScreen();
 	PlayGame();
 	//Pause();
 }

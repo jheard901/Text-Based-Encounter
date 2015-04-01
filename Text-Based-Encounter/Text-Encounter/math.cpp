@@ -1,7 +1,8 @@
 
 #include "math.h"
-#include <stdlib.h> //srand(), rand()
+#include <cstdlib> //srand(), rand()
 
+namespace math {
 //create a random float between 0 - 1
 float frn() {
 	float randNum = float(rand());
@@ -36,3 +37,4 @@ int GetTrueRandomInt(int a, int b)
 	return rand() % c + a;
 }
 
+};

@@ -3,7 +3,12 @@
 #include "math.h"
 #include "utility.h"
 #include <iostream>
-#include <math.h>	//round()
+#include <cmath>	//round()
+
+static bool checkAgainst100Percent(const float chance)
+{
+    return math::frn() * 100.0 <= chance;
+}
 
 Character::Character() : bAlive(true)
 {
@@ -46,10 +51,10 @@ Character::~Character()
 
 void Character::GenID()
 {
-	_myID.i.i1 = GetRandomInt(0, 9);
-	_myID.i.i2 = GetRandomInt(0, 9);
-	_myID.i.i3 = GetRandomInt(0, 9);
-	_myID.i.i4 = GetRandomInt(0, 9);
+	_myID.i.i1 = math::GetRandomInt(0, 9);
+	_myID.i.i2 = math::GetRandomInt(0, 9);
+	_myID.i.i3 = math::GetRandomInt(0, 9);
+	_myID.i.i4 = math::GetRandomInt(0, 9);
 }
 
 void Character::GenName()
@@ -102,12 +107,12 @@ void Character::InitCharacter(int controllerType, int initState)
 void Character::Attack(Character* target)
 {
 	//calculate some damage
-	int damage = GetRandomInt(cStats.AttackDmg, cStats.AttackDmg * 1.2);
+	int damage = math::GetRandomInt(cStats.AttackDmg, cStats.AttackDmg * 1.2);
 
 	//check if it crits
 	if (IsCriticalHit())
 	{
-		DisplayString("\nIt's a critical hit!");
+		utility::DisplayString("\nIt's a critical hit!");
 		damage *= CRIT_MULTIPLIER;
 		ResetCrit();
 	}
@@ -118,44 +123,17 @@ void Character::Attack(Character* target)
 
 bool Character::IsCriticalHit()
 {
-	float roll = frn() * 100;
-
-	if (roll <= cStats.CritChance)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+    return checkAgainst100Percent(cStats.CritChance);
 }
 
 bool Character::IsCounterAttack()
 {
-	float roll = frn() * 100;
-
-	if (roll <= cStats.CounterChance)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+    return checkAgainst100Percent(cStats.CounterChance);
 }
 
 bool Character::IsFleeing(float chance)
 {
-	float roll = frn() * 100;
-
-	if (roll <= chance)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+    return checkAgainst100Percent(chance);
 }
 
 //this is where we check what state the character is in, and respond accordingly based off that
@@ -167,15 +145,27 @@ void Character::DamageTaken(float dmgTaken, int srcPawnID, std::string srcPawnNa
 	case(NORMAL) :
 		cStats.Health -= dmgTaken;
 		SetDamaged(true);
-		DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" took "); std::cout << dmgTaken; DisplayString(" damage.");
+		utility::DisplayString("\nPawn "); 
+        std::cout << GetName(); 
+        utility::DisplayString(" took "); 
+        std::cout << dmgTaken;
+        utility::DisplayString(" damage.");
 		break;
 	//half damage taken and possible for a counter attack
 	case(DEFENDING) :
 		cStats.Health -= round(dmgTaken * 0.5);
-		DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" was defending and only took "); std::cout << round(dmgTaken * 0.5); DisplayString(" damage.");
+		utility::DisplayString("\nPawn "); 
+        std::cout << GetName(); 
+        utility::DisplayString(" was defending and only took "); 
+        std::cout << round(dmgTaken * 0.5); 
+        utility::DisplayString(" damage.");
 		if (IsCounterAttack())
 		{
-			DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" landed a counter attack and inflicted "); std::cout << dmgTaken; DisplayString(" damage back!");
+			utility::DisplayString("\nPawn "); 
+            std::cout << GetName(); 
+            utility::DisplayString(" landed a counter attack and inflicted "); 
+            std::cout << dmgTaken; 
+            utility::DisplayString(" damage back!");
 			SetCountered(true);
 			cntrDmg = dmgTaken;
 			ResetCounter();
@@ -185,13 +175,21 @@ void Character::DamageTaken(float dmgTaken, int srcPawnID, std::string srcPawnNa
 	case(CHARGING) :
 		cStats.Health -= dmgTaken;
 		SetDamaged(true);
-		DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" took "); std::cout << dmgTaken; DisplayString(" damage.");
+		utility::DisplayString("\nPawn "); 
+        std::cout << GetName(); 
+        utility::DisplayString(" took "); 
+        std::cout << dmgTaken; 
+        utility::DisplayString(" damage.");
 		break;
 	//full damage taken
 	case(FLEEING) :
 		cStats.Health -= dmgTaken;
 		SetDamaged(true);
-		DisplayString("\nPawn "); std::cout << GetName(); DisplayString(" took "); std::cout << dmgTaken; DisplayString(" damage.");
+		utility::DisplayString("\nPawn "); 
+        std::cout << GetName(); 
+        utility::DisplayString(" took "); 
+        std::cout << dmgTaken; 
+        utility::DisplayString(" damage.");
 		break;
 	}
 }
@@ -207,7 +205,7 @@ Action Character::GetAction()
 		std::cout << "\nCharge = 2";
 		std::cout << "\nFlee = 3";
 		std::cout << "\nSelect an action: ";
-		int iAction = GetInt(0, 3);
+		int iAction = utility::GetInt(0, 3);
 		return static_cast<Action>(iAction);
 	}
 	//AI should automatically choose (no visual output)
@@ -513,7 +511,7 @@ Action Character::PickBestAction(Character* target)
 	float accumulatedWeight = 0;
 	float normalizedWeight[numActions];
 	float weightCount = 0;
-	float randValue = frn();
+	float randValue = math::frn();
 	for (int i = 0; i < numActions; i++)
 	{
 		accumulatedWeight += hValue[i];
@@ -539,7 +537,7 @@ Action Character::PickBestAction(Character* target)
 	int j = 0;
 	while (1)
 	{
-		if (normalizedWeight[j] >= frn())
+		if (normalizedWeight[j] >= math::frn())
 		{
 			action = j;
 			break;

@@ -10,7 +10,9 @@
 
 #include "driver.h"
 #include <iostream>
-#include <Windows.h>
+#if defined(WIN32) || defined(WIN64) || defined(_WIN32)
+    #include <Windows.h>
+#endif
 
 void SetupConsole();
 
@@ -24,8 +26,10 @@ int main()
 
 //resizing the console source: http://www.3dbuzz.com/forum/threads/102195-How-do-you-resize-a-console-window-in-C
 //enables scrolling with mouse wheel | Source: http://stackoverflow.com/questions/4687745/how-to-enable-scrollable-console
+
 void SetupConsole()
 {
+#if defined(WIN32) || defined(WIN64) || defined(_WIN32)  
 	//setting console size | Note: this is measured by rows/columns, not pixels!
 	const int WIDTH = 90;
 	const int HEIGHT = 30;
@@ -53,4 +57,7 @@ void SetupConsole()
 	//enabling mouse scrolling (not working | it appears to be much more complicated than this)
 	//GetConsoleMode(hConsole, &mode);
 	//SetConsoleMode(hConsole, mode & ~ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT);
+#else
+    // TODO lol
+#endif
 }
