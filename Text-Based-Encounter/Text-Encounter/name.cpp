@@ -54,7 +54,7 @@ std::string GName::GetRandomName()
 {
 	if (!nContainer.empty())
 	{
-		int roll = GetTrueRandomInt(0, nContainer.size() - 1);
+		int roll = math::GetTrueRandomInt(0, nContainer.size() - 1);
 		std::string val = nContainer.at(roll);
 		nContainer.erase(nContainer.begin() + roll);	//remove that name from container since it has been assigned
 		return val;
@@ -65,7 +65,7 @@ std::string GName::GetRandomTeamName()
 {
 	if (!nTeamContainer.empty())
 	{
-		int roll = GetTrueRandomInt(0, nTeamContainer.size() - 1);
+		int roll = math::GetTrueRandomInt(0, nTeamContainer.size() - 1);
 		std::string val = nTeamContainer.at(roll);
 		nTeamContainer.erase(nTeamContainer.begin() + roll);
 		return val;

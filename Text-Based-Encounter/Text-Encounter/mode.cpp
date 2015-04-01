@@ -112,7 +112,7 @@ void DefaultPlayMode::InitGame()
 		break;
 	case(MULTIPLAYER) :
 		std::cout << "\n\nMultiplayer not implemented yet. Please restart game!\n";
-		Pause();
+		utility::Pause();
 		exit(0);
 		switch (pNetwork)
 		{
@@ -146,7 +146,7 @@ void DefaultPlayMode::ActionPhase()
 void DefaultPlayMode::CombatPhase()
 {
 	//picking a team to go first is decided randomly ("Team x has first strike!" is outputted)
-	int rPick = GetTrueRandomInt(0, 1);
+	int rPick = math::GetTrueRandomInt(0, 1);
 	Alpha->ResetCombatStatus();
 	Beta->ResetCombatStatus();
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "name.h"	//gives unique name ids to objects
-#include <stdint.h> //uint16_t
+#include <cstdint>//uint16_t
 
 enum Controller { PLAYER, AI };
 enum Action { ATTACK, DEFEND, CHARGE, FLEE };
@@ -14,15 +14,15 @@ private:
 	//personal identifier
 	struct _IDTag
 	{
-		uint16_t i1;
-		uint16_t i2;
-		uint16_t i3;
-		uint16_t i4;
+		std::uint16_t i1;
+		std::uint16_t i2;
+		std::uint16_t i3;
+		std::uint16_t i4;
 	};
 	union _keyIDTag
 	{
 		_IDTag i;
-		uint64_t id;
+		std::uint64_t id;
 	};
 	_keyIDTag _myID;
 	std::string name;
